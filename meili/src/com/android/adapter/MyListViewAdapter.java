@@ -4,14 +4,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.BaseAdapter;
 import android.widget.Checkable;
 import android.widget.ImageView;
@@ -21,11 +23,12 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.android.meili.R;
+import com.android.tools.ImageTools;
+import com.android.util.ScreenInfo;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.FailReason;
-import com.nostra13.universalimageloader.core.assist.ImageLoadingListener;
-import com.view.ImageTools;
+import com.nostra13.universalimageloader.core.listener.ImageLoadingListener;
 
 public class MyListViewAdapter extends BaseAdapter {
 	Context mContext;
@@ -44,10 +47,11 @@ public class MyListViewAdapter extends BaseAdapter {
 	// private CallBacks mCallBacks;
 	// private int mListenerId = -1;
 	private boolean mIsRoundImg;
+	private boolean mGalleryListlayoutParam = false;
 
 	ImageLoader imageLoader = ImageLoader.getInstance();
 	DisplayImageOptions options = new DisplayImageOptions.Builder()
-			.cacheInMemory().cacheOnDisc().bitmapConfig(Bitmap.Config.RGB_565)
+			.cacheInMemory(true).cacheOnDisc(true).bitmapConfig(Bitmap.Config.RGB_565)
 			.build();
 
 	private ArrayList<ChangeImage> mArrayList = new ArrayList<ChangeImage>();
@@ -126,6 +130,37 @@ public class MyListViewAdapter extends BaseAdapter {
 			lp.setMargins(marginLeftLen, 0, 0, 0);
 			v.setLayoutParams(lp);
 		}
+	}
+	
+	private void setViewBackGround(final View v,String value){
+		imageLoader.loadImage(value, new ImageLoadingListener() {
+			@Override
+			public void onLoadingCancelled(String arg0, View arg1) {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			public void onLoadingComplete(String arg0, View arg1,
+					Bitmap arg2) {
+				// TODO Auto-generated method stub
+				v.setBackgroundDrawable(ImageTools.bitmapToDrawable(arg2));
+			}
+
+			@Override
+			public void onLoadingFailed(String arg0, View arg1,
+					FailReason arg2) {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			public void onLoadingStarted(String arg0, View arg1) {
+				// TODO Auto-generated method stub
+
+			}
+
+		});
 	}
 
 	private void setViewImage(final ImageView v, String value) {
@@ -272,12 +307,18 @@ public class MyListViewAdapter extends BaseAdapter {
 					}
 				} else if (v instanceof RelativeLayout) {
 					if (data instanceof Integer) {
-						v.setBackgroundResource((Integer)data);
-					} else{
+						v.setBackgroundResource((Integer) data);
+					} else if (data instanceof String) {
+						setViewBackGround(v,(String)data);
+					} else {
 						setViewVisable((ViewGroup) v, (Boolean) data);
 					}
 				} else if (v instanceof LinearLayout) {
-					setViewVisable((ViewGroup) v, (Boolean) data);
+					if (data instanceof Integer) {
+						v.setBackgroundResource((Integer) data);
+					} else {
+						setViewVisable((ViewGroup) v, (Boolean) data);
+					}
 				} else {
 					throw new IllegalStateException(v.getClass().getName()
 							+ " is not a "
@@ -295,6 +336,10 @@ public class MyListViewAdapter extends BaseAdapter {
 			v.setVisibility(android.view.View.GONE);
 		}
 	}
+	
+	public void setGalleryListLayoutParam(boolean flag){
+		mGalleryListlayoutParam = flag;
+	}
 
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
@@ -302,6 +347,19 @@ public class MyListViewAdapter extends BaseAdapter {
 		View v;
 		if (convertView == null) {
 			v = inflater.inflate(layoutId, parent, false);
+			if (mGalleryListlayoutParam) {
+				Log.i(TAG, "instanceof MainActivity ......");
+				RelativeLayout bg = (RelativeLayout) v
+						.findViewById(R.id.background);
+
+				DisplayMetrics metrics = ScreenInfo
+						.getScreenInfo((Activity) mContext);
+				int width = metrics.widthPixels;
+				int hight = metrics.heightPixels;
+				AbsListView.LayoutParams mLayoutParams = new AbsListView.LayoutParams(
+						width, hight / 3);
+				bg.setLayoutParams(mLayoutParams);
+			}
 		} else {
 			v = convertView;
 		}

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="50dp"
     android:background="@drawable/top_bg" >
 
     <TextView
@@ -14,10 +14,19 @@
 
     <ImageView
         android:id="@+id/back_btn"
-        android:layout_width="wrap_content"
+        android:layout_width="55dp"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
-        android:layout_marginLeft="16dp"
-        android:background="@drawable/btn_back" />
+        android:src="@drawable/btn_back" />
+    
+    <ImageView
+        android:id="@+id/button1"
+        android:layout_width="wrap_content"
+        android:layout_height="fill_parent"
+        android:layout_toRightOf="@id/back_btn"
+        android:layout_centerVertical="true"
+        android:src="@drawable/btn_nine"
+        android:visibility="invisible" 
+        />
 
 </RelativeLayout>
